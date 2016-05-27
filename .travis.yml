@@ -1,0 +1,2 @@
+script:
+  - bash ./spec/spec.sh
