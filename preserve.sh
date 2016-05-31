@@ -10,8 +10,8 @@ if [ $# -lt 4 ]; then
   die "USAGE: $0 SOURCE METADATA DEST1 DEST2"
 fi 
 
-which sweep   || die 'Require "sweep", a CLI to Sophos'
-which fits.sh || die 'Add fits to PATH and chmod: "PATH=$PATH:/.../fits; chmod a+x "/.../fits/fits.sh"'
+[ "$CI" = 'true' ] || which sweep   || die 'Requires "sweep", a CLI to Sophos'
+[ "$CI" = 'true' ] || which fits.sh || die 'Add fits to PATH and chmod: "PATH=$PATH:/.../fits; chmod a+x "/.../fits/fits.sh"'
 
 # Keep this after usage to keep output clean.
 set -ex
