@@ -10,10 +10,18 @@ if [ $# -lt 4 ]; then
   exit 1
 fi 
 
-# TODO: Sophos scan
+###############
+# Sophos scan
+###############
 
 mkdir $METADATA
-touch $METADATA/fake-sophos.txt
+( 
+  if [ "$CI" = 'true' ]; then
+    echo 'fake sophos output'
+  else
+    sweep $SOURCE
+  fi
+) > $METADATA/sophos.txt
 
 # TODO: Clean filenames
 
