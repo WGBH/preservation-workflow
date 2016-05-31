@@ -4,10 +4,9 @@ SOURCE=$1
 METADATA=$2
 DEST1=$3
 DEST2=$4
-POSTCOPY=$5
 
 if [ $# -lt 4 ]; then
-  echo "USAGE: $0 SOURCE METADATA DEST1 DEST2 [ POSTCOPY ]"
+  echo "USAGE: $0 SOURCE METADATA DEST1 DEST2"
   exit 1
 fi 
 
