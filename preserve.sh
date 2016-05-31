@@ -1,14 +1,20 @@
 #!/bin/bash
-set -ex
 SOURCE=$1
 METADATA=$2
 DEST1=$3
 DEST2=$4
 
+die() { echo "$@" 1>&2 ; exit 1; }
+
 if [ $# -lt 4 ]; then
-  echo "USAGE: $0 SOURCE METADATA DEST1 DEST2"
-  exit 1
+  die "USAGE: $0 SOURCE METADATA DEST1 DEST2"
 fi 
+
+which sweep   || die 'Require "sweep", a CLI to Sophos'
+which fits.sh || die 'Add fits to PATH and chmod: "PATH=$PATH:/.../fits; chmod a+x "/.../fits/fits.sh"'
+
+# Keep this after usage to keep output clean.
+set -ex
 
 mkdir $METADATA
 
