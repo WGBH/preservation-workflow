@@ -19,18 +19,28 @@ mkdir $METADATA
   if [ "$CI" = 'true' ]; then
     echo 'fake sophos output'
   else
-    sweep $SOURCE
+    sweep $SOURCE # TODO: any non-default parameters?
   fi
 ) > $METADATA/sophos.txt
 
-# TODO: Clean filenames
+###################
+# Clean filenames
+###################
 
-# TODO: Copy
+find $SOURCE | perl -ne 'chomp; next unless /[:;,]/; $clean=$_; $clean=~s/[:;,]/_/g; `mv "$_" "$clean"`'
+
+##############
+# List files
+##############
+
+find $SOURCE > $METADATA/files.txt
+
+########
+# Copy
+########
 
 cp -a $SOURCE $DEST1
 cp -a $SOURCE $DEST2
-
-# TODO: post-Copy hook to introduce errors and see how they are handled
 
 # TODO: Diff
 

@@ -1,0 +1,2 @@
+tmp/input
+tmp/input/bad_name_for_file.txt
