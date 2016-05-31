@@ -10,11 +10,12 @@ if [ $# -lt 4 ]; then
   exit 1
 fi 
 
+mkdir $METADATA
+
 ###############
 # Sophos scan
 ###############
 
-mkdir $METADATA
 ( 
   if [ "$CI" = 'true' ]; then
     echo 'fake sophos output'
@@ -28,6 +29,7 @@ mkdir $METADATA
 ###################
 
 find $SOURCE | perl -ne 'chomp; next unless /[:;,]/; $clean=$_; $clean=~s/[:;,]/_/g; `mv "$_" "$clean"`'
+# TODO: just get the script that's currently in use...
 
 ##############
 # List files
@@ -42,7 +44,24 @@ find $SOURCE > $METADATA/files.txt
 cp -a $SOURCE $DEST1
 cp -a $SOURCE $DEST2
 
-# TODO: Diff
+########
+# Hook
+########
+
+if [ "$HOOK" ]; then
+  eval $HOOK
+fi
+
+########
+# Diff
+########
+
+diff -qr $SOURCE $DEST1
+diff -qr $SOURCE $DEST2
+
+########
+# FITS
+########
 
 # TODO: Zip Fits
 
