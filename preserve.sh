@@ -63,6 +63,11 @@ diff -qr $SOURCE $DEST2
 # FITS
 ########
 
-# TODO: Zip Fits
-
-# TODO: Fits to .txt for FM
+mkdir $METADATA/fits
+if [ "$CI" = 'true' ]; then
+  echo 'fake FITS output' > $METADATA/fits/fake-fits.xml
+else
+  fits.sh -i $SOURCE -o $METADATA/fits -r
+fi
+zip -r $METADATA/fits.zip $METADATA/fits
+for FITS in `ls $METADATA/fits/*`; do mv $FITS $FITS.txt; done
