@@ -6,6 +6,13 @@ DEST2=$4
 
 die() { echo "$@" 1>&2 ; exit 1; }
 
+message() {
+  echo "travis_fold:end:$LAST"
+  echo '#' $1
+  echo "travis_fold:start:$1"
+  LAST=$1
+}
+
 if [ $# -lt 4 ]; then
   die "USAGE: $0 SOURCE METADATA DEST1 DEST2"
 fi 
@@ -22,6 +29,7 @@ mkdir $METADATA
 # Sophos scan
 ###############
 
+message 'sophos'
 ( 
   if [ "$CI" = 'true' ]; then
     echo 'fake sophos output'
@@ -34,6 +42,7 @@ mkdir $METADATA
 # Clean filenames
 ###################
 
+message 'filenames'
 find $SOURCE | perl -ne 'chomp; next unless /[:;,]/; $clean=$_; $clean=~s/[:;,]/_/g; `mv "$_" "$clean"`'
 # TODO: just get the script that's currently in use...
 
@@ -41,12 +50,14 @@ find $SOURCE | perl -ne 'chomp; next unless /[:;,]/; $clean=$_; $clean=~s/[:;,]/
 # List files
 ##############
 
+message 'list'
 find $SOURCE > $METADATA/`basename $SOURCE`-file-list.txt
 
 ########
 # Copy
 ########
 
+message 'copy'
 cp -a $SOURCE $DEST1
 cp -a $SOURCE $DEST2
 
@@ -54,6 +65,7 @@ cp -a $SOURCE $DEST2
 # Hook
 ########
 
+message 'hook'
 if [ "$HOOK" ]; then
   eval $HOOK
 fi
@@ -62,6 +74,7 @@ fi
 # Diff
 ########
 
+message 'diff'
 mkdir $METADATA/diff
 diff -qrs $SOURCE $DEST1 > $METADATA/diff/`basename $DEST1`-1.diff
 diff -qrs $SOURCE $DEST2 > $METADATA/diff/`basename $DEST2`-2.diff
@@ -70,6 +83,7 @@ diff -qrs $SOURCE $DEST2 > $METADATA/diff/`basename $DEST2`-2.diff
 # FITS
 ########
 
+message 'fits'
 mkdir $METADATA/fits
 if [ "$CI" = 'true' ]; then
   for FILE in `find $SOURCE -type f`; do touch $METADATA/fits/`basename $FILE`-fake-fits.xml; done
