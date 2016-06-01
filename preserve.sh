@@ -41,7 +41,7 @@ find $SOURCE | perl -ne 'chomp; next unless /[:;,]/; $clean=$_; $clean=~s/[:;,]/
 # List files
 ##############
 
-find $SOURCE > $METADATA/files.txt
+find $SOURCE > $METADATA/`basename $SOURCE`-file-list.txt
 
 ########
 # Copy
