@@ -76,5 +76,7 @@ if [ "$CI" = 'true' ]; then
 else
   fits.sh -i $SOURCE -o $METADATA/fits -r
 fi
+
+for DOT_FILE in `find $METADATA/fits -regex '.*/\.[^/]*'`; do rm $DOT_FILE; done
 zip -r $METADATA/fits.zip $METADATA/fits
 for FITS in `ls $METADATA/fits/*`; do mv $FITS $FITS.txt; done
