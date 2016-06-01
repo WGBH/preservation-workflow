@@ -103,7 +103,8 @@ message 'fits'
     rm $DOT_FILE
   done
   
-  zip -r $METADATA/fits.zip $METADATA/fits
+  # -j: junk paths. pushd / popd is another alternative.
+  zip -jr $METADATA/fits.zip $METADATA/fits
   for FITS in `ls $METADATA/fits/*`; do 
     mv $FITS $FITS.txt
   done
