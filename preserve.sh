@@ -72,7 +72,7 @@ diff -qrs $SOURCE $DEST2 > $METADATA/diff/`basename $DEST2`-2.diff
 
 mkdir $METADATA/fits
 if [ "$CI" = 'true' ]; then
-  echo 'fake FITS output' > $METADATA/fits/fake-fits.xml
+  for FILE in `find $SOURCE`; do touch $METADATA/fits/`basename $FILE`-fake-fits.xml; done
 else
   fits.sh -i $SOURCE -o $METADATA/fits -r
 fi

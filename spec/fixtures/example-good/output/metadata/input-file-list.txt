@@ -1,2 +1,3 @@
 tmp/input
+tmp/input/.should-be-ignored-by-fits.txt
 tmp/input/bad_name_for_file.txt
