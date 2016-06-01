@@ -14,7 +14,7 @@ setup spec/fixtures/example-good/input
 
 # Expect success
 CI=true bash ./preserve.sh tmp/input tmp/output/metadata tmp/output/dest-1 tmp/output/dest-2
-diff --exclude=*.zip -qr spec/fixtures/example-good/output tmp/output
+diff --exclude=*.zip -ru spec/fixtures/example-good/output tmp/output
 
 setup spec/fixtures/example-good/input
 
