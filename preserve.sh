@@ -28,7 +28,7 @@ mkdir $METADATA
   else
     sweep $SOURCE # TODO: any non-default parameters?
   fi
-) > $METADATA/sophos.txt
+) > $METADATA/`basename $SOURCE`-virus-scan.txt
 
 ###################
 # Clean filenames
@@ -41,7 +41,7 @@ find $SOURCE | perl -ne 'chomp; next unless /[:;,]/; $clean=$_; $clean=~s/[:;,]/
 # List files
 ##############
 
-find $SOURCE > $METADATA/files.txt
+find $SOURCE > $METADATA/`basename $SOURCE`-file-list.txt
 
 ########
 # Copy
