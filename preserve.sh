@@ -77,11 +77,11 @@ fi
 message 'diff'
 mkdir $METADATA/diff
 
-locale   # I think differences in collation cause problems in comparisons?
+locale   # Differences in collation meant the traversal order was different.
 LC_ALL=C # Sort by ASCII
 
-diff -qrs $SOURCE $DEST1 | sort > $METADATA/diff/`basename $DEST1`-1.diff
-diff -qrs $SOURCE $DEST2 | sort > $METADATA/diff/`basename $DEST2`-2.diff
+diff -qrs $SOURCE $DEST1 > $METADATA/diff/`basename $DEST1`-1.diff
+diff -qrs $SOURCE $DEST2 > $METADATA/diff/`basename $DEST2`-2.diff
 
 ########
 # FITS
