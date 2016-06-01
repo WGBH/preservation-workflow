@@ -28,7 +28,7 @@ mkdir $METADATA
   else
     sweep $SOURCE # TODO: any non-default parameters?
   fi
-) > $METADATA/sophos.txt
+) > $METADATA/`basename $SOURCE`-virus-scan.txt
 
 ###################
 # Clean filenames
