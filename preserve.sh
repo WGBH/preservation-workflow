@@ -3,11 +3,12 @@ SOURCE=$1
 METADATA=$2
 DEST1=$3
 DEST2=$4
+LAST=''
 
 die() { echo "$@" 1>&2 ; exit 1; }
 
 message() {
-  echo "travis_fold:end:$LAST"
+  [ "$LAST" ] && echo "travis_fold:end:$LAST"
   echo "travis_fold:start:$1"
   echo $1
   LAST=$1
@@ -113,3 +114,5 @@ message 'fits'
 ########
 
 wait
+
+echo "travis_fold:end:$LAST"
