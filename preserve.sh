@@ -53,48 +53,59 @@ find $SOURCE | perl -ne 'chomp; next unless /[:;,]/; $clean=$_; $clean=~s/[:;,]/
 message 'list'
 find $SOURCE > $METADATA/`basename $SOURCE`-file-list.txt
 
-########
-# Copy
-########
+#################
+# Copy and Diff
+#################
 
-message 'copy'
-cp -a $SOURCE $DEST1
-cp -a $SOURCE $DEST2
+copy_and_diff() {
+  SOURCE=$1
+  METADATA=$2
+  DEST=$3
+  HOOK=$4
+  cp -a $SOURCE $DEST
+  if [ "$HOOK" ]; then
+    eval $HOOK
+  fi
+  
+  mkdir -p $METADATA/diff
 
-########
-# Hook
-########
+  LC_ALL=C # Sort by ASCII: Differences in locale meant the traversal order was different.
 
-message 'hook'
-if [ "$HOOK" ]; then
-  eval $HOOK
-fi
+  diff -qrs $SOURCE $DEST > $METADATA/diff/`basename $DEST`.diff
+}
 
-########
-# Diff
-########
+message 'copy_and_diff'
 
-message 'diff'
-mkdir $METADATA/diff
-
-locale   # Differences in collation meant the traversal order was different.
-LC_ALL=C # Sort by ASCII
-
-diff -qrs $SOURCE $DEST1 > $METADATA/diff/`basename $DEST1`-1.diff
-diff -qrs $SOURCE $DEST2 > $METADATA/diff/`basename $DEST2`-2.diff
+copy_and_diff $SOURCE $METADATA $DEST1 $HOOK &
+copy_and_diff $SOURCE $METADATA $DEST2 $HOOK &
 
 ########
 # FITS
 ########
 
 message 'fits'
-mkdir $METADATA/fits
-if [ "$CI" = 'true' ]; then
-  for FILE in `find $SOURCE -type f`; do touch $METADATA/fits/`basename $FILE`-fake-fits.xml; done
-else
-  fits.sh -i $SOURCE -o $METADATA/fits -r
-fi
+(
+  mkdir $METADATA/fits
+  if [ "$CI" = 'true' ]; then
+    for FILE in `find $SOURCE -type f`; do
+      touch $METADATA/fits/`basename $FILE`-fake-fits.xml
+    done
+  else
+    fits.sh -i $SOURCE -o $METADATA/fits -r
+  fi
 
-for DOT_FILE in `find $METADATA/fits -regex '.*/\.[^/]*'`; do rm $DOT_FILE; done
-zip -r $METADATA/fits.zip $METADATA/fits
-for FITS in `ls $METADATA/fits/*`; do mv $FITS $FITS.txt; done
+  for DOT_FILE in `find $METADATA/fits -regex '.*/\.[^/]*'`; do 
+    rm $DOT_FILE
+  done
+  
+  zip -r $METADATA/fits.zip $METADATA/fits
+  for FITS in `ls $METADATA/fits/*`; do 
+    mv $FITS $FITS.txt
+  done
+) &
+
+########
+# wait
+########
+
+wait
