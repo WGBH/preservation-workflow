@@ -62,8 +62,9 @@ fi
 # Diff
 ########
 
-diff -qr $SOURCE $DEST1
-diff -qr $SOURCE $DEST2
+mkdir $METADATA/diff
+diff -qrs $SOURCE $DEST1 > $METADATA/diff/`basename $DEST1`-1.diff
+diff -qrs $SOURCE $DEST2 > $METADATA/diff/`basename $DEST2`-2.diff
 
 ########
 # FITS

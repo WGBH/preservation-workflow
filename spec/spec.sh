@@ -1,5 +1,7 @@
 set -ex
 
+trap 'echo "FAIL!"' ERR
+
 function setup {
     rm -rf tmp
     mkdir -p tmp/output
@@ -19,3 +21,5 @@ setup spec/fixtures/example-good/input
 # Expect failure because of diff
 ! CI=true HOOK='echo "corrupted" > tmp/output/dest-1/bad_name_for_file.txt' \
   bash ./preserve.sh tmp/input tmp/output/metadata tmp/output/dest-1 tmp/output/dest-2
+
+echo 'PASS!'
