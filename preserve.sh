@@ -3,11 +3,12 @@ SOURCE=$1
 METADATA=$2
 DEST1=$3
 DEST2=$4
+LAST=''
 
 die() { echo "$@" 1>&2 ; exit 1; }
 
 message() {
-  echo "travis_fold:end:$LAST"
+  [ "$LAST" ] && echo "travis_fold:end:$LAST"
   echo "travis_fold:start:$1"
   echo $1
   LAST=$1
@@ -53,48 +54,65 @@ find $SOURCE | perl -ne 'chomp; next unless /[:;,]/; $clean=$_; $clean=~s/[:;,]/
 message 'list'
 find $SOURCE > $METADATA/`basename $SOURCE`-file-list.txt
 
-########
-# Copy
-########
+#################
+# Copy and Diff
+#################
 
-message 'copy'
-cp -a $SOURCE $DEST1
-cp -a $SOURCE $DEST2
+copy_and_diff() {
+  L_SOURCE=$1
+  L_METADATA=$2
+  L_DEST=$3
+  L_HOOK=$4
+  cp -a $L_SOURCE $L_DEST
+  if [ "$L_HOOK" ]; then
+    eval $L_HOOK
+  fi
+  
+  mkdir -p $L_METADATA/diff
 
-########
-# Hook
-########
+  LC_ALL=C # Sort by ASCII: Differences in locale meant the traversal order was different.
 
-message 'hook'
-if [ "$HOOK" ]; then
-  eval $HOOK
-fi
+  diff -qrs $L_SOURCE $L_DEST > $L_METADATA/diff/`basename $L_DEST`.diff
+}
 
-########
-# Diff
-########
+message 'copy_and_diff'
 
-message 'diff'
-mkdir $METADATA/diff
+copy_and_diff $SOURCE $METADATA $DEST1 "$HOOK" &
+sleep 1
+copy_and_diff $SOURCE $METADATA $DEST2 "$HOOK" &
+sleep 1
 
-locale   # Differences in collation meant the traversal order was different.
-LC_ALL=C # Sort by ASCII
-
-diff -qrs $SOURCE $DEST1 > $METADATA/diff/`basename $DEST1`-1.diff
-diff -qrs $SOURCE $DEST2 > $METADATA/diff/`basename $DEST2`-2.diff
+# sleep so that in tests, processes will not actually overlap.
 
 ########
 # FITS
 ########
 
 message 'fits'
-mkdir $METADATA/fits
-if [ "$CI" = 'true' ]; then
-  for FILE in `find $SOURCE -type f`; do touch $METADATA/fits/`basename $FILE`-fake-fits.xml; done
-else
-  fits.sh -i $SOURCE -o $METADATA/fits -r
-fi
+(
+  mkdir $METADATA/fits
+  if [ "$CI" = 'true' ]; then
+    for FILE in `find $SOURCE -type f`; do
+      touch $METADATA/fits/`basename $FILE`-fake-fits.xml
+    done
+  else
+    fits.sh -i $SOURCE -o $METADATA/fits -r
+  fi
 
-for DOT_FILE in `find $METADATA/fits -regex '.*/\.[^/]*'`; do rm $DOT_FILE; done
-zip -r $METADATA/fits.zip $METADATA/fits
-for FITS in `ls $METADATA/fits/*`; do mv $FITS $FITS.txt; done
+  for DOT_FILE in `find $METADATA/fits -regex '.*/\.[^/]*'`; do 
+    rm $DOT_FILE
+  done
+  
+  zip -r $METADATA/fits.zip $METADATA/fits
+  for FITS in `ls $METADATA/fits/*`; do 
+    mv $FITS $FITS.txt
+  done
+) &
+
+########
+# wait
+########
+
+wait
+
+echo "travis_fold:end:$LAST"
