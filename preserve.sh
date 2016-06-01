@@ -8,8 +8,8 @@ die() { echo "$@" 1>&2 ; exit 1; }
 
 message() {
   echo "travis_fold:end:$LAST"
-  echo '#' $1
   echo "travis_fold:start:$1"
+  echo $1
   LAST=$1
 }
 
