@@ -44,8 +44,15 @@ message 'sophos'
 ###################
 
 message 'filenames'
-find $SOURCE | perl -ne 'chomp; next unless /[:;,]/; $clean=$_; $clean=~s/[:;,]/_/g; `mv "$_" "$clean"`'
-# TODO: just get the script that's currently in use...
+for DIR in `find $SOURCE -type d | grep '[:;]'`; do
+  TARGET=`echo "$DIR" | sed 's/[:;]/_/g'`
+  mkdir -p $TARGET
+done
+for FILE in `find $SOURCE ! -type d | grep '[:;]'`; do
+  TARGET=`echo "$FILE" | sed 's/[:;]/_/g'`
+  mv $FILE $TARGET
+done
+find . -type d -empty -delete
 
 ##############
 # List files
