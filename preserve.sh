@@ -1,9 +1,4 @@
 #!/bin/bash
-SOURCE=$1
-METADATA=$2
-DEST1=$3
-DEST2=$4
-LAST=''
 
 die() { echo "$@" 1>&2 ; exit 1; }
 
@@ -14,8 +9,8 @@ message() {
   LAST=$1
 }
 
-if [ $# -lt 4 ]; then
-  die "USAGE: $0 SOURCE METADATA DEST1 DEST2"
+if [ $# -lt 3 ]; then
+  die "USAGE: $0 SOURCE METADATA DEST1 [ DEST2 ... ]"
 fi 
 
 [ "$CI" = 'true' ] || which sweep   || die 'Requires "sweep", a CLI to Sophos'
@@ -23,6 +18,9 @@ fi
 
 # Keep this after usage to keep output clean.
 set -ex
+
+SOURCE=$1; shift
+METADATA=$1; shift
 
 mkdir $METADATA
 
@@ -69,10 +67,9 @@ copy_and_diff() {
   L_SOURCE=$1
   L_METADATA=$2
   L_DEST=$3
-  L_HOOK=$4
   cp -a $L_SOURCE $L_DEST
-  if [ "$L_HOOK" ]; then
-    eval $L_HOOK
+  if [ "$HOOK" ]; then
+    eval "$HOOK"
   fi
   
   mkdir -p $L_METADATA/diff
@@ -84,12 +81,12 @@ copy_and_diff() {
 
 message 'copy_and_diff'
 
-copy_and_diff $SOURCE $METADATA $DEST1 "$HOOK" &
-sleep 1
-copy_and_diff $SOURCE $METADATA $DEST2 "$HOOK" &
-sleep 1
-
-# sleep so that in tests, processes will not actually overlap.
+while (( "$#" )); do
+  DEST=$1; shift
+  copy_and_diff $SOURCE $METADATA $DEST &
+  sleep 1
+  # sleep so that in tests, processes will not actually overlap.
+done
 
 ########
 # FITS
