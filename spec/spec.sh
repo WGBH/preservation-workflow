@@ -1,6 +1,6 @@
 set -ex
 
-trap 'find . | grep -v .git | sort; echo "FAIL!"' ERR
+trap 'find . | grep -v .git | LC_ALL=C sort; echo "FAIL!"' ERR
 
 function setup {
     rm -rf tmp
