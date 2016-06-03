@@ -18,6 +18,7 @@ end
 
 source = ARGV.shift
 metadata = ARGV.shift
+@hook = ARGV.shift if ARGV[0].match(' ')
 
 Dir.mkdir(metadata)
 
@@ -52,7 +53,7 @@ def clean_names(source)
       FileUtils.mv(file, file.gsub(bad_re, '_'))
     end
   end
-  `"find #{source} -type d -empty -delete"` # TODO
+  `find #{source} -type d -empty -delete` # TODO
 end
 
 clean_names(source)
@@ -63,67 +64,67 @@ clean_names(source)
 
 message('list')
 
-File.write("#{metadata}/#{File.basename(source)}-file-list.txt", Dir.glob("#{source}/**/*").join("\n"))
+File.write(
+  "#{metadata}/#{File.basename(source)}-file-list.txt",
+  Dir.glob("#{source}/**/*").join("\n")
+)
 
 ##################
-## Copy and Diff
+# Copy and Diff
 ##################
-#
-#copy_and_diff() {
-#  L_SOURCE=$1
-#  L_METADATA=$2
-#  L_DEST=$3
-#  cp -a $L_SOURCE $L_DEST
-#  if [ "$HOOK" ]; then
-#    eval "$HOOK"
-#  fi
-#  
-#  mkdir -p $L_METADATA/diff
-#
-#  LC_ALL=C # Sort by ASCII: Differences in locale meant the traversal order was different.
-#
-#  diff -qrs $L_SOURCE $L_DEST >> $L_METADATA/diff/`basename $L_DEST`.diff
-#}
-#
-#message 'copy_and_diff'
-#
-#while (( "$#" )); do
-#  DEST=$1; shift
-#  copy_and_diff $SOURCE $METADATA $DEST &
-#  sleep 1
-#  # sleep so that in tests, processes will not actually overlap.
-#done
-#
+
+@copy_diff_id = 0
+
+def fork_copy_diff(source, metadata, dest)
+  @copy_diff_id += 1
+  fork do
+    FileUtils.cp_r(source, dest)
+    `@hook` if @hook
+    FileUtils.mkdir_p("#{metadata}/diff")
+    File.write(
+      "#{metadata}/diff/#{File.basename(dest)}-#{@copy_diff_id}.diff",
+      `diff -qrs #{source} #{dest}`
+    )
+  end
+end
+
+message('copy_and_diff')
+
+ARGV.each do |dest|
+  fork_copy_diff(source, metadata, dest)
+end
+
 #########
-## FITS
+# FITS
 #########
-#
-#message 'fits'
-#(
-#  mkdir $METADATA/fits
-#  if [ "$CI" = 'true' ]; then
-#    for FILE in `find $SOURCE -type f`; do
-#      touch $METADATA/fits/`basename $FILE`-fake-fits.xml
-#    done
-#  else
-#    fits.sh -i $SOURCE -o $METADATA/fits -r
-#  fi
-#
-#  for DOT_FILE in `find $METADATA/fits -regex '.*/\.[^/]*'`; do 
-#    rm $DOT_FILE
-#  done
-#  
-#  # -j: junk paths. pushd / popd is another alternative.
-#  zip -jr $METADATA/fits.zip $METADATA/fits
-#  for FITS in `ls $METADATA/fits/*`; do 
-#    mv $FITS $FITS.txt
-#  done
-#) &
-#
+
+message('fits')
+
+fork do
+  FileUtils.mkdir_p("#{metadata}/fits")
+  if ENV['CI']
+    Dir.glob("#{source}/**/*") do |file|
+      `touch #{metadata}/fits/#{File.basename(file)}-fake-fits.xml` if File.file?(file)
+    end
+  else
+    `fits.sh -i #{source} -o #{metadata}/fits -r`
+  end
+  
+  Dir.glob("#{metadata}/fits/*") do |file|
+    File.unlink(file) if File.basename(file) =~ /^\./
+  end
+  
+  `zip -jr #{metadata}/fits.zip #{metadata}/fits`
+  
+  Dir.glob("#{metadata}/fits/*") do |file|
+    FileUtils.mv(file, "#{file}.txt")
+  end
+end
+
 #########
-## wait
+# wait
 #########
-#
-#wait
-#
-#echo "travis_fold:end:$LAST"
+
+Process.wait
+
+puts "travis_fold:end:#{@last}"

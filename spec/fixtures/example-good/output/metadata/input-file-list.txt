@@ -1,4 +1,2 @@
-tmp/input
-tmp/input/.should-be-ignored-by-fits.txt
 tmp/input/bad_dir_name
 tmp/input/bad_dir_name/bad_file_name.txt
