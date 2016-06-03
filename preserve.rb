@@ -122,6 +122,6 @@ end
 # wait
 #########
 
-Process.wait
+Process.waitall
 
 puts "travis_fold:end:#{@last}" if ENV['CI']
