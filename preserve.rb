@@ -10,8 +10,10 @@ abort_unless('sweep', 'Requires "sweep", a CLI to Sophos')
 abort_unless('fits.sh', 'Add fits to PATH and chmod: "PATH=$PATH:/.../fits; chmod a+x "/.../fits/fits.sh"')
 
 def message(message)
-  puts "travis_fold:end:#{@last}" if @last
-  puts "travis_fold:start:#{message}"
+  if ENV['CI']
+    puts "travis_fold:end:#{@last}" if @last 
+    puts "travis_fold:start:#{message}"
+  end
   puts message
   @last = message
 end
@@ -127,4 +129,4 @@ end
 
 Process.wait
 
-puts "travis_fold:end:#{@last}"
+puts "travis_fold:end:#{@last}" if ENV['CI']
