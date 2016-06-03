@@ -68,7 +68,7 @@ message('list')
 
 File.write(
   "#{metadata}/#{File.basename(source)}-file-list.txt",
-  Dir.glob("#{source}/**/*").join("\n")
+  Dir.glob("#{source}/**/*").sort.join("\n") # sort for stable order across environments
 )
 
 ##################
