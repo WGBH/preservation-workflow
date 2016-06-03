@@ -103,7 +103,7 @@ fork do
   FileUtils.mkdir_p("#{metadata}/fits")
   if ENV['CI']
     Dir.glob("#{source}/**/*") do |file|
-      `touch #{metadata}/fits/#{File.basename(file)}-fake-fits.xml` if File.file?(file)
+      `touch "#{metadata}/fits/#{File.basename(file)}-fake-fits.xml"` if File.file?(file)
     end
   else
     `fits.sh -i #{source} -o #{metadata}/fits -r`
