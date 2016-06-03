@@ -82,7 +82,7 @@ def fork_copy_diff(source, metadata, dest)
     FileUtils.mkdir_p(File.dirname("#{metadata}/diff/#{dest}"))
     File.write(
       "#{metadata}/diff/#{dest}.diff",
-      `diff -qrs #{source} #{dest}`
+      `LC_ALL=C diff -qrs #{source} #{dest}` # LC_ALL for stable iteration over files.
     )
   end
 end
