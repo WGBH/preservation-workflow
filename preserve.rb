@@ -75,16 +75,13 @@ File.write(
 # Copy and Diff
 ##################
 
-@copy_diff_id = 0
-
 def fork_copy_diff(source, metadata, dest)
-  @copy_diff_id += 1
   fork do
     FileUtils.cp_r(source, dest)
     `@hook` if @hook
-    FileUtils.mkdir_p("#{metadata}/diff")
+    FileUtils.mkdir_p(File.dirname("#{metadata}/diff/#{dest}"))
     File.write(
-      "#{metadata}/diff/#{File.basename(dest)}-#{@copy_diff_id}.diff",
+      "#{metadata}/diff/#{dest}.diff",
       `diff -qrs #{source} #{dest}`
     )
   end
