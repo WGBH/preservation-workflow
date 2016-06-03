@@ -80,10 +80,7 @@ def fork_copy_diff(source, metadata, dest)
     FileUtils.cp_r(source, dest)
     `@hook` if @hook
     FileUtils.mkdir_p(File.dirname("#{metadata}/diff/#{dest}"))
-    diff = `LC_ALL=C diff -qrs #{source} #{dest}` # LC_ALL for stable iteration over files.
-    puts '####################'
-    puts diff
-    puts '####################'
+    diff = `diff -qrs #{source} #{dest} | sort`
     File.write("#{metadata}/diff/#{dest}.diff", diff)
   end
 end
