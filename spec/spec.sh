@@ -1,6 +1,6 @@
 set -ex
 
-trap 'find .; echo "FAIL!"' ERR
+trap 'git status; find . | grep -v .git | sort; echo "FAIL!"' ERR
 
 function setup {
     rm -rf tmp
