@@ -1,6 +1,6 @@
 set -ex
 
-trap 'echo "FAIL!"' ERR
+trap 'find .; echo "FAIL!"' ERR
 
 function setup {
     rm -rf tmp
