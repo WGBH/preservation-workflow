@@ -76,7 +76,7 @@ copy_and_diff() {
 
   LC_ALL=C # Sort by ASCII: Differences in locale meant the traversal order was different.
 
-  diff -qrs $L_SOURCE $L_DEST > $L_METADATA/diff/`basename $L_DEST`.diff
+  diff -qrs $L_SOURCE $L_DEST >> $L_METADATA/diff/`basename $L_DEST`.diff
 }
 
 message 'copy_and_diff'
