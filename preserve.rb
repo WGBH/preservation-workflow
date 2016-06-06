@@ -20,7 +20,6 @@ end
 
 source = ARGV.shift
 metadata = ARGV.shift
-@hook = ARGV.shift if ARGV[0].match(' ')
 
 Dir.mkdir(metadata)
 
@@ -78,7 +77,7 @@ File.write(
 def fork_copy_diff(source, metadata, dest, i)
   fork do
     FileUtils.cp_r(source, dest)
-    `@hook` if @hook
+    `#{ENV['HOOK']}` if ENV['HOOK']
     FileUtils.mkdir_p("#{metadata}/diff")
     diff = `diff -qrs '#{source}' '#{dest}'`.split("\n").sort.join("\n") + "\n"# Stable order
     File.write("#{metadata}/diff/dest-#{i}.diff", diff)

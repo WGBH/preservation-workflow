@@ -14,7 +14,7 @@ function setup {
 setup spec/fixtures/example-good/input
 
 # Expect success
-CI=true ruby ./preserve.rb tmp/input tmp/output/metadata tmp/output/dest-1 tmp/output/dest-2
+CI=true ruby ./preserve.rb tmp/input 'tmp/output/metadata 0' 'tmp/output/dest 1' 'tmp/output/dest 2'
 diff --exclude=*.zip -ru spec/fixtures/example-good/output tmp/output
 
 setup spec/fixtures/example-good/input
