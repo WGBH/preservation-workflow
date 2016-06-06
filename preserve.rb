@@ -75,20 +75,20 @@ File.write(
 # Copy and Diff
 ##################
 
-def fork_copy_diff(source, metadata, dest)
+def fork_copy_diff(source, metadata, dest, i)
   fork do
     FileUtils.cp_r(source, dest)
     `@hook` if @hook
-    FileUtils.mkdir_p(File.dirname("#{metadata}/diff/#{dest}"))
+    FileUtils.mkdir_p("#{metadata}/diff")
     diff = `diff -qrs '#{source}' '#{dest}'`.split("\n").sort.join("\n") + "\n"# Stable order
-    File.write("#{metadata}/diff/#{dest}.diff", diff)
+    File.write("#{metadata}/diff/dest-#{i}.diff", diff)
   end
 end
 
 message('copy_and_diff')
 
-ARGV.each do |dest|
-  fork_copy_diff(source, metadata, dest)
+ARGV.each_with_index do |dest, i|
+  fork_copy_diff(source, metadata, dest, i)
 end
 
 #########
