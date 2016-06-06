@@ -34,7 +34,7 @@ def sweep(filename)
   if ENV['CI']
     "fake sophos output\n"
   else
-    `sweep "#{filename}"` # TODO: what if filename contains quotes?
+    `sweep '#{filename}'` # TODO: what if filename contains quotes?
   end
 end
 
@@ -55,7 +55,7 @@ def clean_names(source)
       FileUtils.mv(file, file.gsub(bad_re, '_'))
     end
   end
-  `find #{source} -type d -empty -delete` # TODO
+  `find '#{source}' -type d -empty -delete` # TODO
 end
 
 clean_names(source)
@@ -80,7 +80,7 @@ def fork_copy_diff(source, metadata, dest)
     FileUtils.cp_r(source, dest)
     `@hook` if @hook
     FileUtils.mkdir_p(File.dirname("#{metadata}/diff/#{dest}"))
-    diff = `diff -qrs #{source} #{dest}`.split("\n").sort.join("\n") + "\n"# Stable order
+    diff = `diff -qrs '#{source}' '#{dest}'`.split("\n").sort.join("\n") + "\n"# Stable order
     File.write("#{metadata}/diff/#{dest}.diff", diff)
   end
 end
@@ -101,17 +101,17 @@ fork do
   FileUtils.mkdir_p("#{metadata}/fits")
   if ENV['CI']
     Dir.glob("#{source}/**/*") do |file|
-      `touch "#{metadata}/fits/#{File.basename(file)}-fake-fits.xml"` if File.file?(file)
+      `touch '#{metadata}/fits/#{File.basename(file)}-fake-fits.xml'` if File.file?(file)
     end
   else
-    `fits.sh -i #{source} -o #{metadata}/fits -r`
+    `fits.sh -i '#{source}' -o '#{metadata}'/fits -r`
   end
   
   Dir.glob("#{metadata}/fits/*") do |file|
     File.unlink(file) if File.basename(file) =~ /^\./
   end
   
-  `zip -jr #{metadata}/fits.zip #{metadata}/fits`
+  `zip -jr '#{metadata}/fits.zip' '#{metadata}/fits'`
   
   Dir.glob("#{metadata}/fits/*") do |file|
     FileUtils.mv(file, "#{file}.txt")
