@@ -80,7 +80,9 @@ def fork_copy_diff(source, metadata, dest, i)
     `#{ENV['HOOK']}` if ENV['HOOK']
     FileUtils.mkdir_p("#{metadata}/diff")
     diff = `diff -qrs '#{source}' '#{dest}'`.split("\n").sort.join("\n") + "\n"# Stable order
-    File.write("#{metadata}/diff/dest-#{i}.diff", diff)
+    diff_filename = "#{metadata}/diff/dest-#{i}.diff"
+    File.write(diff_filename, diff)
+    raise("diff not clean: #{diff_filename}") if $?.exitstatus != 0
   end
 end
 
