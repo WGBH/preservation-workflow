@@ -11,16 +11,28 @@ function setup {
     cp -a $1 tmp/input
 }
 
+
 setup spec/fixtures/example-good/input
 
 # Expect success
-CI=true ruby ./preserve.rb tmp/input tmp/output/metadata tmp/output/dest-1 tmp/output/dest-2
+CI=true ruby ./preserve.rb tmp/input 'tmp/output/metadata 0' 'tmp/output/dest 1' 'tmp/output/dest 2'
 diff --exclude=*.zip -ru spec/fixtures/example-good/output tmp/output
+
 
 setup spec/fixtures/example-good/input
 
-# Expect failure because of diff
-#! CI=true HOOK='echo "corrupted" > tmp/output/dest-1/bad_name_for_file.txt' \
-#  ruby ./preserve.rb tmp/input tmp/output/metadata tmp/output/dest-1 tmp/output/dest-2
+# Expect non-zero status
+! CI=true HOOK='echo "corrupted" > "tmp/output/dest 1/only-in-dest.txt"' \
+  ruby ./preserve.rb tmp/input tmp/output/metadata 'tmp/output/dest 1'
+
+
+setup spec/fixtures/example-good/input
+
+# Expect error message. (Redundant but less confusing than trying to do both at the same time?)
+[[ `
+    CI=true HOOK='echo "corrupted" > "tmp/output/dest 1/only-in-dest.txt"' \
+    ruby ./preserve.rb tmp/input tmp/output/metadata 'tmp/output/dest 1' 2>&1
+   ` =~ 'diff not clean' ]] || false
+# (Tests by themselves are not trapped, so we need the explicit 'false' at the end.)
 
 echo 'PASS!'

@@ -20,7 +20,6 @@ end
 
 source = ARGV.shift
 metadata = ARGV.shift
-@hook = ARGV.shift if ARGV[0].match(' ')
 
 Dir.mkdir(metadata)
 
@@ -34,7 +33,7 @@ def sweep(filename)
   if ENV['CI']
     "fake sophos output\n"
   else
-    `sweep "#{filename}"` # TODO: what if filename contains quotes?
+    `sweep '#{filename}'` # TODO: what if filename contains quotes?
   end
 end
 
@@ -55,7 +54,7 @@ def clean_names(source)
       FileUtils.mv(file, file.gsub(bad_re, '_'))
     end
   end
-  `find #{source} -type d -empty -delete` # TODO
+  `find '#{source}' -type d -empty -delete` # TODO
 end
 
 clean_names(source)
@@ -75,20 +74,22 @@ File.write(
 # Copy and Diff
 ##################
 
-def fork_copy_diff(source, metadata, dest)
+def fork_copy_diff(source, metadata, dest, i)
   fork do
     FileUtils.cp_r(source, dest)
-    `@hook` if @hook
-    FileUtils.mkdir_p(File.dirname("#{metadata}/diff/#{dest}"))
-    diff = `diff -qrs #{source} #{dest}`.split("\n").sort.join("\n") + "\n"# Stable order
-    File.write("#{metadata}/diff/#{dest}.diff", diff)
+    `#{ENV['HOOK']}` if ENV['HOOK']
+    FileUtils.mkdir_p("#{metadata}/diff")
+    diff = `diff -qrs '#{source}' '#{dest}'`.split("\n").sort.join("\n") + "\n"# Stable order
+    diff_filename = "#{metadata}/diff/dest-#{i}.diff"
+    File.write(diff_filename, diff)
+    raise("diff not clean: #{diff_filename}") if $?.exitstatus != 0
   end
 end
 
 message('copy_and_diff')
 
-ARGV.each do |dest|
-  fork_copy_diff(source, metadata, dest)
+ARGV.each_with_index do |dest, i|
+  fork_copy_diff(source, metadata, dest, i)
 end
 
 #########
@@ -101,17 +102,17 @@ fork do
   FileUtils.mkdir_p("#{metadata}/fits")
   if ENV['CI']
     Dir.glob("#{source}/**/*") do |file|
-      `touch "#{metadata}/fits/#{File.basename(file)}-fake-fits.xml"` if File.file?(file)
+      `touch '#{metadata}/fits/#{File.basename(file)}-fake-fits.xml'` if File.file?(file)
     end
   else
-    `fits.sh -i #{source} -o #{metadata}/fits -r`
+    `fits.sh -i '#{source}' -o '#{metadata}'/fits -r`
   end
   
   Dir.glob("#{metadata}/fits/*") do |file|
     File.unlink(file) if File.basename(file) =~ /^\./
   end
   
-  `zip -jr #{metadata}/fits.zip #{metadata}/fits`
+  `zip -jr '#{metadata}/fits.zip' '#{metadata}/fits'`
   
   Dir.glob("#{metadata}/fits/*") do |file|
     FileUtils.mv(file, "#{file}.txt")
