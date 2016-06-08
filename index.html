@@ -7,17 +7,21 @@
     </head>
     <body>
         <input type="file">
+        <input id="search">
         <div id="output"></div>
         <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.2.2/jquery.min.js"></script>
         <script src="https://cdnjs.cloudflare.com/ajax/libs/jstree/3.2.1/jstree.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery.quicksearch/2.2.1/jquery.quicksearch.min.js"></script>
         <script>
             $(function () {
-                $('input').change(function () {
+                var data;
+                
+                $('input[type="file"]').change(function () {
                     var reader = new FileReader();
                     reader.onload = (function (event) {
                         var lines = event.target.result.split("\n");
                         var prefix = lines[0];
-                        var data = $.map(lines.slice(1), function (s) {
+                        data = $.map(lines.slice(1), function (s) {
                             var id = '#' + s.split(prefix).slice(1).join(prefix);
                             return {
                                 id: id,
@@ -33,6 +37,23 @@
 
                     });
                     reader.readAsText(this.files[0]);
+                });
+                
+                $('#search').change(function () {
+                    // On close, nodes are removed from DAM, 
+                    // so we need to search the data structure underneath.
+                    var $tree = $('.jstree').jstree();
+                    $tree.close_all();
+                    $tree.deselect_all();
+                    
+                    var search = $(this).val();
+                    $.each(data, function(i, datum) {
+                        if (datum.text.includes(search)) {
+                            var parent_id = $tree.get_parent(datum.id);
+                            $tree.open_node(parent_id);
+                            $tree.select_node(datum.id);
+                        }
+                    });
                 });
             });
         </script>
