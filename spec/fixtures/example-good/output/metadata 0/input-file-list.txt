@@ -1,3 +1,4 @@
+tmp/input
 tmp/input/bad_dir_name
 tmp/input/bad_dir_name/bad_file_name.txt
 tmp/input/ok name
