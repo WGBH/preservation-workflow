@@ -3,19 +3,28 @@
     <head>
         <title>Navigator</title>
         <meta charset="UTF-8"/>
-        <style>
-        </style>
+        <link href="https://cdnjs.cloudflare.com/ajax/libs/jstree/3.2.1/themes/default/style.min.css" rel="stylesheet" type="text/css">
     </head>
     <body>
         <input type="file">
         <div id="output"></div>
         <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.2.2/jquery.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/jstree/3.2.1/jstree.min.js"></script>
         <script>
             $(function(){
                $('input').change(function(){
                   var reader = new FileReader();
                   reader.onload = (function(event) {
-                      $('#output').text(event.target.result);
+                      //$('#output').text(event.target.result);
+                      
+                      $('#output').jstree({ core: {
+                        data: [
+                            {id: 'a/b/c', parent: 'a/b', text: 'c'},
+                            {id: 'a/b', parent: 'a', text: 'b'},
+                            {id: 'a', parent: '#', text: 'a'}
+                        ]
+                    } });
+                      
                   });
                   reader.readAsText(this.files[0]);
                });
