@@ -1,2 +1,4 @@
 script:
+  - ruby -run -e httpd . -p 5000 & # Why can't phantomjs just work with a file URI?
+  - phantomjs js/run-qunit.js http://localhost:5000/spec/spec.html
   - bash ./spec/spec.sh
