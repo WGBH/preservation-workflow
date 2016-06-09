@@ -7,33 +7,57 @@
     </head>
     <body>
         <input type="file">
-        <input id="search">
+        <input id="search" style="display: none;">
         <div id="output"></div>
         <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.2.2/jquery.min.js"></script>
         <script src="https://cdnjs.cloudflare.com/ajax/libs/jstree/3.2.1/jstree.min.js"></script>
-        <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery.quicksearch/2.2.1/jquery.quicksearch.min.js"></script>
         <script>
             $(function () {
                 var data;
+                
+                function dirname(path) {
+                    return path.split('/').slice(0, -1).join('/');
+                }
+                function basename(path) {
+                    return path.split('/').slice(-1)[0];
+                }
+                function extension(path) {
+                    var match = basename(path).match(/\.[^.]+/);
+                    if (match) {
+                        return match[0];
+                    }
+                }
+                function ancestors(path) {
+                    var ancestors = [];
+                    var current = dirname(path);
+                    while (current !== "") {
+                        ancestors.push(current);
+                        current = dirname(current);
+                    }
+                    return ancestors;
+                }
+                function lines_to_data(lines) {
+                    var prefix = lines[0];
+                    return $.map(lines.slice(1), function (line) {
+                        var id = '#' + line.split(prefix).slice(1).join(prefix);
+                        return {
+                            id: id,
+                            parent: dirname(id),
+                            text: basename(id)
+                        };
+                    });
+                }
                 
                 $('input[type="file"]').change(function () {
                     var reader = new FileReader();
                     reader.onload = (function (event) {
                         var lines = event.target.result.split("\n");
-                        var prefix = lines[0];
-                        data = $.map(lines.slice(1), function (s) {
-                            var id = '#' + s.split(prefix).slice(1).join(prefix);
-                            return {
-                                id: id,
-                                parent: id.split('/').slice(0, -1).join('/'),
-                                text: id.split('/').slice(-1)[0]
-                            };
-                        });
                         $('#output').jstree({
                             core: {
-                                data: data
+                                data: lines_to_data(lines)
                             }
                         });
+                        $('#search').show();
 
                     });
                     reader.readAsText(this.files[0]);
