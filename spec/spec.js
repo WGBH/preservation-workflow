@@ -15,10 +15,10 @@ QUnit.test('extension, unset', function (assert) {
     assert.equal(lib.extension('a/b/c'), null);
 });
 QUnit.test('ancestors, deep', function (assert) {
-    assert.deepEqual(lib.ancestors('a/b/c'), ['a/b', 'a']);
+    assert.deepEqual(lib.ancestors('a/b/c'), ['a/b/c', 'a/b', 'a']);
 });
 QUnit.test('ancestors, shallow', function (assert) {
-    assert.deepEqual(lib.ancestors('a'), []);
+    assert.deepEqual(lib.ancestors('a'), ['a']);
 });
 QUnit.test('lines_to_data', function (assert) {
     assert.deepEqual(
@@ -36,4 +36,15 @@ QUnit.test('lines_to_data', function (assert) {
                 }
             ]);
 });
-
+QUnit.test('descendant_extensions', function (assert) {
+    assert.deepEqual(
+            lib.descendant_extensions(lib.lines_to_data(['a', 'a/b', 'a/b/c.txt'])),
+            {
+                "#": [
+                    "txt"
+                ],
+                "#/b": [
+                    "txt"
+                ]
+            });
+});

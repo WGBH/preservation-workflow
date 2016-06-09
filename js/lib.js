@@ -12,8 +12,9 @@ var lib = {
         }
     },
     ancestors: function (path) {
+        // Actually, ancestors + self
         var ancestors = [];
-        var current = lib.dirname(path);
+        var current = path;
         while (current !== "") {
             ancestors.push(current);
             current = lib.dirname(current);
@@ -30,5 +31,21 @@ var lib = {
                 text: lib.basename(id)
             };
         });
+    },
+    descendant_extensions: function(data) {
+        var index = {};
+        $.each(data, function(i, datum){
+            var ancestors = lib.ancestors(datum.parent);
+            var extension = lib.extension(datum.text);
+            if (extension) {
+                $.each(ancestors, function(i, ancestor){
+                    if (!index[ancestor]) {
+                        index[ancestor] = [];
+                    }
+                    index[ancestor].push(extension);
+                });
+            }
+        });
+        return index;
     }
 };
