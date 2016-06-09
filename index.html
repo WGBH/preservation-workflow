@@ -15,12 +15,15 @@
         <script>
             $(function () {
                 var data;
-                
+
                 $('input[type="file"]').change(function () {
+                    $.jstree.destroy();
                     var reader = new FileReader();
                     reader.onload = (function (event) {
                         var lines = event.target.result.split("\n");
-                        data = lib.add_extensions_to_data(lib.lines_to_data(lines));
+                        data = lib.add_extensions_to_data(
+                                lib.lines_to_data(lines),
+                                ['mov', 'mp4', 'mts', 'r3d', 'jpg', 'jpeg']);
                         $('#output').jstree({
                             core: {
                                 data: data
@@ -31,16 +34,16 @@
                     });
                     reader.readAsText(this.files[0]);
                 });
-                
+
                 $('#search').change(function () {
                     // On close, nodes are removed from DAM, 
                     // so we need to search the data structure underneath.
                     var $tree = $('.jstree').jstree();
                     $tree.close_all();
                     $tree.deselect_all();
-                    
+
                     var search = $(this).val();
-                    $.each(data, function(i, datum) {
+                    $.each(data, function (i, datum) {
                         if (datum.text.includes(search)) {
                             var parent_id = $tree.get_parent(datum.id);
                             $tree.open_node(parent_id);

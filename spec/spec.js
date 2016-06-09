@@ -22,7 +22,7 @@ QUnit.test('ancestors, shallow', function (assert) {
 });
 QUnit.test('lines_to_data', function (assert) {
     assert.deepEqual(
-            lib.lines_to_data(['a', 'a/b', 'a/b/c']),
+            lib.lines_to_data(['a', 'a/b', 'a/b/c', '', '']), // Empty lines at end should be stripped.
             [
                 {
                     "id": "#/b",
@@ -50,12 +50,14 @@ QUnit.test('descendant_extensions', function (assert) {
 });
 QUnit.test('add_extensions_to_data', function (assert) {
     assert.deepEqual(
-            lib.add_extensions_to_data(lib.lines_to_data(['a', 'a/b', 'a/b/c.txt', 'a/b/d.xml', 'a/b/e.xml', 'a/z', 'a/z/z.txt'])),
+            lib.add_extensions_to_data(
+                lib.lines_to_data(['a', 'a/b', 'a/b/c.txt', 'a/b/d.xml', 'a/b/e.xml', 'a/z', 'a/z/z.txt']),
+                ['txt']),
             [
                 {
                     "id": "#/b",
                     "parent": "#",
-                    "text": "b (txt xml)"
+                    "text": "b (txt)"
                 },
                 {
                     "id": "#/b/c.txt",

@@ -23,14 +23,18 @@ var lib = {
     },
     lines_to_data: function (lines) {
         var prefix = lines[0];
-        return $.map(lines.slice(1), function (line) {
-            var id = '#' + line.split(prefix).slice(1).join(prefix);
-            return {
-                id: id,
-                parent: lib.dirname(id),
-                text: lib.basename(id)
-            };
-        });
+        return $.map(
+                $.grep(lines.slice(1), function (line) {
+                    return line; // Ignore blank lines.
+                }),
+                function (line) {
+                    var id = '#' + line.split(prefix).slice(1).join(prefix);
+                    return {
+                        id: id,
+                        parent: lib.dirname(id),
+                        text: lib.basename(id)
+                    };
+                });
     },
     descendant_extensions: function (data) {
         var index = {};
@@ -48,11 +52,16 @@ var lib = {
         });
         return index;
     },
-    add_extensions_to_data: function (data) {
-        var extensions = lib.descendant_extensions(data);
+    add_extensions_to_data: function (data, only_show) {
+        var extensions_index = lib.descendant_extensions(data);
         return $.map(data, function (datum) {
-            datum.text = extensions[datum.id]
-                    ? datum.text + ' (' + Object.keys(extensions[datum.id]).join(' ') + ')'
+            var extensions = $.grep(
+                    Object.keys(extensions_index[datum.id] || {}),
+                    function (extension) {
+                        return only_show.indexOf(extension) !== -1;
+                    });
+            datum.text = extensions.length > 0
+                    ? datum.text + ' (' + extensions.join(' ') + ')'
                     : datum.text;
             return datum;
         });
