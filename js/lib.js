@@ -32,20 +32,29 @@ var lib = {
             };
         });
     },
-    descendant_extensions: function(data) {
+    descendant_extensions: function (data) {
         var index = {};
-        $.each(data, function(i, datum){
+        $.each(data, function (i, datum) {
             var ancestors = lib.ancestors(datum.parent);
             var extension = lib.extension(datum.text);
             if (extension) {
-                $.each(ancestors, function(i, ancestor){
+                $.each(ancestors, function (i, ancestor) {
                     if (!index[ancestor]) {
-                        index[ancestor] = [];
+                        index[ancestor] = {};
                     }
-                    index[ancestor].push(extension);
+                    index[ancestor][extension] = true;
                 });
             }
         });
         return index;
+    },
+    add_extensions_to_data: function (data) {
+        var extensions = lib.descendant_extensions(data);
+        return $.map(data, function (datum) {
+            datum.text = extensions[datum.id]
+                    ? datum.text + ' (' + Object.keys(extensions[datum.id]).join(' ') + ')'
+                    : datum.text;
+            return datum;
+        });
     }
 };

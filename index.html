@@ -20,7 +20,7 @@
                     var reader = new FileReader();
                     reader.onload = (function (event) {
                         var lines = event.target.result.split("\n");
-                        data = lib.lines_to_data(lines);
+                        data = lib.add_extensions_to_data(lib.lines_to_data(lines));
                         $('#output').jstree({
                             core: {
                                 data: data

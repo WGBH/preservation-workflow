@@ -40,11 +40,47 @@ QUnit.test('descendant_extensions', function (assert) {
     assert.deepEqual(
             lib.descendant_extensions(lib.lines_to_data(['a', 'a/b', 'a/b/c.txt'])),
             {
-                "#": [
-                    "txt"
-                ],
-                "#/b": [
-                    "txt"
-                ]
+                "#": {
+                    "txt": true
+                },
+                "#/b": {
+                    "txt": true
+                }
             });
+});
+QUnit.test('add_extensions_to_data', function (assert) {
+    assert.deepEqual(
+            lib.add_extensions_to_data(lib.lines_to_data(['a', 'a/b', 'a/b/c.txt', 'a/b/d.xml', 'a/b/e.xml', 'a/z', 'a/z/z.txt'])),
+            [
+                {
+                    "id": "#/b",
+                    "parent": "#",
+                    "text": "b (txt xml)"
+                },
+                {
+                    "id": "#/b/c.txt",
+                    "parent": "#/b",
+                    "text": "c.txt"
+                },
+                {
+                    "id": "#/b/d.xml",
+                    "parent": "#/b",
+                    "text": "d.xml"
+                },
+                {
+                    "id": "#/b/e.xml",
+                    "parent": "#/b",
+                    "text": "e.xml"
+                },
+                {
+                    "id": "#/z",
+                    "parent": "#",
+                    "text": "z (txt)"
+                },
+                {
+                    "id": "#/z/z.txt",
+                    "parent": "#/z",
+                    "text": "z.txt"
+                }
+            ]);
 });
