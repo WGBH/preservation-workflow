@@ -1,3 +1,3 @@
 Files tmp/input/.should-be-ignored-by-fits.txt and tmp/output/dest 1/.should-be-ignored-by-fits.txt are identical
-Files tmp/input/bad_dir_name/bad_file_name.txt and tmp/output/dest 1/bad_dir_name/bad_file_name.txt are identical
+Files tmp/input/bad_dir_name/bad_file_name.mov and tmp/output/dest 1/bad_dir_name/bad_file_name.mov are identical
 Files tmp/input/ok name/ok name.txt and tmp/output/dest 1/ok name/ok name.txt are identical
