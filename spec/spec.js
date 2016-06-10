@@ -20,6 +20,9 @@ QUnit.test('ancestors, deep', function (assert) {
 QUnit.test('ancestors, shallow', function (assert) {
     assert.deepEqual(lib.ancestors('a'), ['a']);
 });
+QUnit.test('label_html', function (assert) {
+    assert.equal(lib.label_html('#a/b', 'c.txt'), '<input size=\"9\" value=\"a/b/c.txt\"><span class=\"basename\">c.txt</span>');
+});
 QUnit.test('lines_to_data', function (assert) {
     assert.deepEqual(
             lib.lines_to_data(['a', 'a/b', 'a/b/c', '', '']), // Empty lines at end should be stripped.
@@ -27,12 +30,12 @@ QUnit.test('lines_to_data', function (assert) {
                 {
                     "id": "#/b",
                     "parent": "#",
-                    "text": "b"
+                    "text": "<input size=\"2\" value=\"/b\"><span class=\"basename\">b</span>"
                 },
                 {
                     "id": "#/b/c",
                     "parent": "#/b",
-                    "text": "c"
+                    "text": "<input size=\"4\" value=\"/b/c\"><span class=\"basename\">c</span>"
                 }
             ]);
 });
@@ -51,38 +54,38 @@ QUnit.test('descendant_extensions', function (assert) {
 QUnit.test('add_extensions_to_data', function (assert) {
     assert.deepEqual(
             lib.add_extensions_to_data(
-                lib.lines_to_data(['a', 'a/b', 'a/b/c.txt', 'a/b/d.xml', 'a/b/e.xml', 'a/z', 'a/z/z.txt']),
-                ['txt']),
+                    lib.lines_to_data(['a', 'a/b', 'a/b/c.txt', 'a/b/d.xml', 'a/b/e.xml', 'a/z', 'a/z/z.txt']),
+                    ['txt']),
             [
                 {
                     "id": "#/b",
                     "parent": "#",
-                    "text": "b (txt)"
+                    "text": "<input size=\"2\" value=\"/b\"><span class=\"basename\">b</span> (txt)"
                 },
                 {
                     "id": "#/b/c.txt",
                     "parent": "#/b",
-                    "text": "c.txt"
+                    "text": "<input size=\"8\" value=\"/b/c.txt\"><span class=\"basename\">c.txt</span>"
                 },
                 {
                     "id": "#/b/d.xml",
                     "parent": "#/b",
-                    "text": "d.xml"
+                    "text": "<input size=\"8\" value=\"/b/d.xml\"><span class=\"basename\">d.xml</span>"
                 },
                 {
                     "id": "#/b/e.xml",
                     "parent": "#/b",
-                    "text": "e.xml"
+                    "text": "<input size=\"8\" value=\"/b/e.xml\"><span class=\"basename\">e.xml</span>"
                 },
                 {
                     "id": "#/z",
                     "parent": "#",
-                    "text": "z (txt)"
+                    "text": "<input size=\"2\" value=\"/z\"><span class=\"basename\">z</span> (txt)"
                 },
                 {
                     "id": "#/z/z.txt",
                     "parent": "#/z",
-                    "text": "z.txt"
+                    "text": "<input size=\"8\" value=\"/z/z.txt\"><span class=\"basename\">z.txt</span>"
                 }
             ]);
 });
