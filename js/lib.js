@@ -93,9 +93,11 @@ var lib = {
         var counts_index = lib.descendant_counts(data);
         console.log(counts_index);
         return $.map(data, function (datum) {
-            datum.text = counts_index[datum.id]
-                    ? datum.text + '<span class="count">' + counts_index[datum.id] + '</span>'
-                    : datum.text;
+            if (counts_index[datum.id]) {
+                datum.text = datum.text + '<span class="count">' + counts_index[datum.id] + '</span>';
+            } else {
+                datum.icon = 'jstree-file';
+            }
             return datum;
         });
     }
