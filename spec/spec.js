@@ -89,3 +89,28 @@ QUnit.test('add_extensions_to_data', function (assert) {
                 }
             ]);
 });
+QUnit.test('descendant_counts', function (assert) {
+    assert.deepEqual(
+            lib.descendant_counts(lib.lines_to_data(['a', 'a/b', 'a/b/c.txt'])),
+            {
+                "#": 2,
+                "#/b": 1
+            });
+});
+QUnit.test('add_counts_to_data', function (assert) {
+    assert.deepEqual(
+            lib.add_counts_to_data(
+                    lib.lines_to_data(['a', 'a/b', 'a/b/c.txt'])),
+            [
+                {
+                    "id": "#/b",
+                    "parent": "#",
+                    "text": "<input size=\"2\" value=\"/b\"><span class=\"basename\">b</span><span class=\"count\">1</span>"
+                },
+                {
+                    "id": "#/b/c.txt",
+                    "parent": "#/b",
+                    "text": "<input size=\"8\" value=\"/b/c.txt\"><span class=\"basename\">c.txt</span>"
+                }
+            ]);
+});

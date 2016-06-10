@@ -33,9 +33,12 @@
                     var reader = new FileReader();
                     reader.onload = (function (event) {
                         var lines = event.target.result.split("\n");
-                        var data = lib.add_extensions_to_data(
-                                lib.lines_to_data(lines),
-                                ['mov', 'mp4', 'mts', 'r3d', 'jpg', 'jpeg']);
+                        var data = lib.add_counts_to_data(
+                                lib.add_extensions_to_data(
+                                        lib.lines_to_data(lines),
+                                        ['mov', 'mp4', 'mts', 'r3d', 'jpg', 'jpeg']
+                                        )
+                                );
                         $('#output').jstree({
                             core: {
                                 data: data

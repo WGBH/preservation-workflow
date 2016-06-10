@@ -75,5 +75,28 @@ var lib = {
                     : datum.text;
             return datum;
         });
+    },
+    descendant_counts: function (data) {
+        var index = {};
+        $.each(data, function (i, datum) {
+            var ancestors = lib.ancestors(datum.parent);
+            $.each(ancestors, function (i, ancestor) {
+                if (!index[ancestor]) {
+                    index[ancestor] = 0;
+                }
+                index[ancestor]++;
+            });
+        });
+        return index;
+    },
+    add_counts_to_data: function (data, only_show) {
+        var counts_index = lib.descendant_counts(data);
+        console.log(counts_index);
+        return $.map(data, function (datum) {
+            datum.text = counts_index[datum.id]
+                    ? datum.text + '<span class="count">' + counts_index[datum.id] + '</span>'
+                    : datum.text;
+            return datum;
+        });
     }
 };
