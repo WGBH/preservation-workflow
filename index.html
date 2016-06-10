@@ -4,6 +4,20 @@
         <title>Navigator</title>
         <meta charset="UTF-8"/>
         <link href="https://cdnjs.cloudflare.com/ajax/libs/jstree/3.2.1/themes/default/style.min.css" rel="stylesheet" type="text/css">
+        <style>
+            body {
+                font-family: sans-serif;
+            }
+            #output input {
+                display: none;
+            }
+            #output .jstree-clicked input {
+                display: inline;
+            }
+            #output .jstree-clicked .basename {
+                display: none;
+            }
+        </style>
     </head>
     <body>
         <input type="file">
@@ -26,7 +40,7 @@
                             core: {
                                 data: data
                             },
-                            plugins: [ "search" ]
+                            plugins: ["search"]
                         });
                         $('#search').show();
 
@@ -37,6 +51,12 @@
                 $('#search').change(function () {
                     var val = $(this).val();
                     $('#output').jstree(true).search(val);
+                });
+
+                $('#output').on("select_node.jstree", function (e, data) {
+                    // TODO: Should we already have the element?
+                    // (Normal search by ID does not work because of internal spaces, etc.)
+                    $('[id="' + data.selected[0] + '"] input')[0].select();
                 });
             });
         </script>

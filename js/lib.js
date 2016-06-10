@@ -21,6 +21,13 @@ var lib = {
         }
         return ancestors;
     },
+    label_html: function(dir, base) {
+        var path = dir.slice(1) + '/' + base;
+        return $('<div>')
+                .append($('<input>').attr('value',path).attr('size', path.length))
+                .append($('<span class="basename">').text(base))
+                .html();
+    },
     lines_to_data: function (lines) {
         var prefix = lines[0];
         return $.map(
@@ -32,7 +39,7 @@ var lib = {
                     return {
                         id: id,
                         parent: lib.dirname(id),
-                        text: lib.basename(id)
+                        text: lib.label_html(lib.dirname(id),lib.basename(id))
                     };
                 });
     },
@@ -40,7 +47,7 @@ var lib = {
         var index = {};
         $.each(data, function (i, datum) {
             var ancestors = lib.ancestors(datum.parent);
-            var extension = lib.extension(datum.text);
+            var extension = lib.extension($(datum.text).text()); // .text is really html.
             if (extension) {
                 $.each(ancestors, function (i, ancestor) {
                     if (!index[ancestor]) {
