@@ -71,7 +71,7 @@ var lib = {
                         return only_show.indexOf(extension) !== -1;
                     });
             datum.text = extensions.length > 0
-                    ? datum.text + ' (' + extensions.join(' ') + ')'
+                    ? datum.text + '<span class="extensions">' + extensions.join(' ') + '</span>'
                     : datum.text;
             return datum;
         });
