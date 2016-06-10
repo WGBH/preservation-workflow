@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>Navigator</title>
+        <meta charset="UTF-8"/>
+        <link href="https://cdnjs.cloudflare.com/ajax/libs/jstree/3.2.1/themes/default/style.min.css" rel="stylesheet" type="text/css">
+    </head>
+    <body>
+        <input type="file">
+        <input id="search" style="display: none;">
+        <div id="output"></div>
+        <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.2.2/jquery.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/jstree/3.2.1/jstree.min.js"></script>
+        <script src="js/lib.js"></script>
+        <script>
+            $(function () {
+                $('input[type="file"]').change(function () {
+                    $.jstree.destroy();
+                    var reader = new FileReader();
+                    reader.onload = (function (event) {
+                        var lines = event.target.result.split("\n");
+                        var data = lib.add_extensions_to_data(
+                                lib.lines_to_data(lines),
+                                ['mov', 'mp4', 'mts', 'r3d', 'jpg', 'jpeg']);
+                        $('#output').jstree({
+                            core: {
+                                data: data
+                            },
+                            plugins: [ "search" ]
+                        });
+                        $('#search').show();
+
+                    });
+                    reader.readAsText(this.files[0]);
+                });
+
+                $('#search').change(function () {
+                    var val = $(this).val();
+                    $('#output').jstree(true).search(val);
+                });
+            });
+        </script>
+    </body>
+</html>
