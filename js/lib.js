@@ -26,7 +26,10 @@ var lib = {
         return $('<div>')
                 .append($('<input>').attr('value',path).attr('size', path.length))
                 .append($('<span class="basename">').text(base))
-                .html();
+                .html()
+                .replace(/(value="[^"]+") (size="[^"]+")/g, "$2 $1");
+                // Phantomjs on Travis returns attributes in a different order.
+                // If we have more than two attributes, revisit.
     },
     lines_to_data: function (lines) {
         var prefix = lines[0];
