@@ -60,7 +60,7 @@ QUnit.test('add_extensions_to_data', function (assert) {
                 {
                     "id": "#/b",
                     "parent": "#",
-                    "text": "<input size=\"2\" value=\"/b\"><span class=\"basename\">b</span> (txt)"
+                    "text": "<input size=\"2\" value=\"/b\"><span class=\"basename\">b</span><span class=\"extensions\">txt</span>"
                 },
                 {
                     "id": "#/b/c.txt",
@@ -80,7 +80,7 @@ QUnit.test('add_extensions_to_data', function (assert) {
                 {
                     "id": "#/z",
                     "parent": "#",
-                    "text": "<input size=\"2\" value=\"/z\"><span class=\"basename\">z</span> (txt)"
+                    "text": "<input size=\"2\" value=\"/z\"><span class=\"basename\">z</span><span class=\"extensions\">txt</span>"
                 },
                 {
                     "id": "#/z/z.txt",
@@ -108,6 +108,7 @@ QUnit.test('add_counts_to_data', function (assert) {
                     "text": "<input size=\"2\" value=\"/b\"><span class=\"basename\">b</span><span class=\"count\">1</span>"
                 },
                 {
+                    "icon": "jstree-file",
                     "id": "#/b/c.txt",
                     "parent": "#/b",
                     "text": "<input size=\"8\" value=\"/b/c.txt\"><span class=\"basename\">c.txt</span>"
