@@ -8,6 +8,9 @@
             body {
                 font-family: sans-serif;
             }
+
+            /* Conditional swapping of input */
+
             #output input {
                 display: none;
             }
@@ -16,6 +19,26 @@
             }
             #output .jstree-clicked .basename {
                 display: none;
+            }
+
+            /* More style for extras */
+
+            #output .basename, #output .extensions, #output .count {
+                margin: 0 0.2em;
+            }
+            #output .count {
+                display: none;
+            }
+            #output .jstree-hovered .count {
+                display: inline;
+            }
+
+            /* No extra highlight on current item: making it input is enough. */
+
+            .jstree-default .jstree-clicked, .jstree-default .jstree-hovered {
+                background: none;
+                border: none;
+                box-shadow: none;
             }
         </style>
     </head>
@@ -33,9 +56,12 @@
                     var reader = new FileReader();
                     reader.onload = (function (event) {
                         var lines = event.target.result.split("\n");
-                        var data = lib.add_extensions_to_data(
-                                lib.lines_to_data(lines),
-                                ['mov', 'mp4', 'mts', 'r3d', 'jpg', 'jpeg']);
+                        var data = lib.add_counts_to_data(
+                                lib.add_extensions_to_data(
+                                        lib.lines_to_data(lines),
+                                        ['mov', 'mp4', 'mts', 'r3d', 'jpg', 'jpeg']
+                                        )
+                                );
                         $('#output').jstree({
                             core: {
                                 data: data

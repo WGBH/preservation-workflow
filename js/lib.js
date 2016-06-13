@@ -26,7 +26,10 @@ var lib = {
         return $('<div>')
                 .append($('<input>').attr('value',path).attr('size', path.length))
                 .append($('<span class="basename">').text(base))
-                .html();
+                .html()
+                .replace(/(value="[^"]+") (size="[^"]+")/g, "$2 $1");
+                // Phantomjs on Travis returns attributes in a different order.
+                // If we have more than two attributes, revisit.
     },
     lines_to_data: function (lines) {
         var prefix = lines[0];
@@ -68,8 +71,33 @@ var lib = {
                         return only_show.indexOf(extension) !== -1;
                     });
             datum.text = extensions.length > 0
-                    ? datum.text + ' (' + extensions.join(' ') + ')'
+                    ? datum.text + '<span class="extensions">' + extensions.join(' ') + '</span>'
                     : datum.text;
+            return datum;
+        });
+    },
+    descendant_counts: function (data) {
+        var index = {};
+        $.each(data, function (i, datum) {
+            var ancestors = lib.ancestors(datum.parent);
+            $.each(ancestors, function (i, ancestor) {
+                if (!index[ancestor]) {
+                    index[ancestor] = 0;
+                }
+                index[ancestor]++;
+            });
+        });
+        return index;
+    },
+    add_counts_to_data: function (data, only_show) {
+        var counts_index = lib.descendant_counts(data);
+        console.log(counts_index);
+        return $.map(data, function (datum) {
+            if (counts_index[datum.id]) {
+                datum.text = datum.text + '<span class="count">' + counts_index[datum.id] + '</span>';
+            } else {
+                datum.icon = 'jstree-file';
+            }
             return datum;
         });
     }
