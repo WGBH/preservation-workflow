@@ -107,7 +107,8 @@ fork do
       `touch '#{metadata}/fits/#{File.basename(file)}-fake-fits.xml'` if File.file?(file)
     end
   else
-    `fits.sh -i '#{source}' -o '#{metadata}'/fits -r`
+    `fits.sh -i '#{source}' -o '#{metadata}'/fits -r 2>&1`
+    # Noise from FITS obscures stuff that really matters.
   end
   
   Dir.glob("#{metadata}/fits/*") do |file|
