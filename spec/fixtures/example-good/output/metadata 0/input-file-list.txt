@@ -1,4 +1,6 @@
 tmp/input
+tmp/input/.hidden-dir
+tmp/input/.hidden-dir/excluded-from-diff-because-of-parent.txt
 tmp/input/bad_dir_name
 tmp/input/bad_dir_name/.should-be-ignored-by-fits.txt
 tmp/input/bad_dir_name/bad_file_name.mov
