@@ -1,6 +1,6 @@
 tmp/input
-tmp/input/.ok name
-tmp/input/.ok name/ok name.txt
 tmp/input/bad_dir_name
 tmp/input/bad_dir_name/.should-be-ignored-by-fits.txt
 tmp/input/bad_dir_name/bad_file_name.mov
+tmp/input/ok name
+tmp/input/ok name/ok name.txt
