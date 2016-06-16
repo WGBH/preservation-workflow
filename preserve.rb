@@ -69,7 +69,6 @@ message('list')
 File.write(
   "#{metadata}/#{File.basename(source)}-file-list.txt",
   Find.find(source).to_a.sort.join("\n")
-  # Explicitly add root.
   # Sort for stable order across environments.
 )
 
