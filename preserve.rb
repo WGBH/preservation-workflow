@@ -1,4 +1,5 @@
 require 'fileutils'
+require 'find'
 
 abort("USAGE: #{$0} SOURCE METADATA DEST1 [ DEST2 ... ]") if ARGV.count < 3
 
@@ -47,7 +48,7 @@ message('filenames')
 
 def clean_names(source)
   bad_re = /[:;]/
-  Dir.glob("#{source}/**/*").grep(bad_re).each do |file|
+  Find.find(source).grep(bad_re).each do |file|
     if File.directory?(file)
       FileUtils.mkdir_p(file.gsub(bad_re, '_'))
     else
@@ -67,8 +68,7 @@ message('list')
 
 File.write(
   "#{metadata}/#{File.basename(source)}-file-list.txt",
-  (Dir.glob("#{source}/**/*") << source).sort.join("\n")
-  # Explicitly add root.
+  Find.find(source).to_a.sort.join("\n")
   # Sort for stable order across environments.
 )
 
@@ -103,7 +103,7 @@ message('fits')
 fork do
   FileUtils.mkdir_p("#{metadata}/fits")
   if ENV['CI']
-    Dir.glob("#{source}/**/*") do |file|
+    Find.find(source) do |file|
       `touch '#{metadata}/fits/#{File.basename(file)}-fake-fits.xml'` if File.file?(file)
     end
   else
@@ -111,8 +111,8 @@ fork do
     # Noise from FITS obscures stuff that really matters.
   end
   
-  Dir.glob("#{metadata}/fits/*") do |file|
-    File.unlink(file) if File.basename(file) =~ /^\./
+  Find.find(metadata + '/fits') do |file|
+    File.unlink(file) if File.basename(file) =~ /^\./ && File.file?(file)
   end
   
   `zip -jr '#{metadata}/fits.zip' '#{metadata}/fits'`
