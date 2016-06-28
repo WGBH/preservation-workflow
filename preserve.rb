@@ -19,7 +19,7 @@ def message(message)
   @last = message
 end
 
-source = ARGV.shift
+source = ENV['CI'] ? ARGV.shift : File.absolute_path(ARGV.shift) # Fixtures are hard with absolute path.
 metadata = ARGV.shift
 
 Dir.mkdir(metadata)
