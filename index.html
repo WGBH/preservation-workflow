@@ -10,30 +10,34 @@
                 font-size: 1em;
             }
 
+            #root {
+                padding-top: 0.5em
+            }
+
             /* Conditional swapping of input */
 
-            #output input {
+            #tree input {
                 display: none;
             }
-            #output .jstree-clicked input {
+            #tree .jstree-clicked input {
                 display: inline;
                 /* Disguise the fact that it's an input, since we do not allow edits. */
                 font-size: 1em; 
                 border: none;
             }
-            #output .jstree-clicked .basename {
+            #tree .jstree-clicked .basename {
                 display: none;
             }
 
             /* More style for extras */
 
-            #output .basename, #output .extensions, #output .count {
+            #tree .basename, #tree .extensions, #tree .count {
                 margin: 0 0.2em;
             }
-            #output .count {
+            #tree .count {
                 display: none;
             }
-            #output .jstree-hovered .count {
+            #tree .jstree-hovered .count {
                 display: inline;
             }
 
@@ -49,7 +53,10 @@
     <body>
         <input type="file">
         <input id="search" style="display: none;">
-        <div id="output"></div>
+
+        <div id="root"></div>
+        <div id="tree"></div>
+
         <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.2.2/jquery.min.js"></script>
         <script src="https://cdnjs.cloudflare.com/ajax/libs/jstree/3.2.1/jstree.min.js"></script>
         <script src="js/lib.js"></script>
@@ -60,13 +67,14 @@
                     var reader = new FileReader();
                     reader.onload = (function (event) {
                         var lines = event.target.result.split("\n");
+                        $('#root').text(lines[0]);
                         var data = lib.add_counts_to_data(
                                 lib.add_extensions_to_data(
                                         lib.lines_to_data(lines),
                                         ['mov', 'mp4', 'mts', 'r3d', 'jpg', 'jpeg']
                                         )
                                 );
-                        $('#output').jstree({
+                        $('#tree').jstree({
                             core: {
                                 data: data
                             },
@@ -80,10 +88,10 @@
 
                 $('#search').change(function () {
                     var val = $(this).val();
-                    $('#output').jstree(true).search(val);
+                    $('#tree').jstree(true).search(val);
                 });
 
-                $('#output').on("select_node.jstree", function (e, data) {
+                $('#tree').on("select_node.jstree", function (e, data) {
                     // TODO: Should we already have the element?
                     // (Normal search by ID does not work because of internal spaces, etc.)
                     $('[id="' + data.selected[0] + '"] input')[0].select();
