@@ -18,7 +18,7 @@ The second goal is to create tehcnical metadata XML that we process and store in
 
 Here is a list of the software you'll need to run `preserve.rb` assuming you're running on a recent Mac OS X machine.
 
-- FITS
+- FITS (and Java 1.7 or higher)
 - Git
 - Ruby
 - Sophos anti-virus
