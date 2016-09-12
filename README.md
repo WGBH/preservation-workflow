@@ -21,7 +21,7 @@ Here is a list of the software you'll need to run `preserve.rb` assuming you're 
 - FITS (and Java 1.7 or higher)
 - Git
 - Ruby
-- Sophos anti-virus
+- Sophos Home (free anti-virus)
 - preservation-workflow repository cloned from Github
 
 If you don't have Sophos, you can try commenting out any refrences to `sweep` and virus scanning in `preserve.rb`.
