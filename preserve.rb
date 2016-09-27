@@ -94,6 +94,8 @@ ARGV.each_with_index do |dest, i|
   fork_copy_diff(source, metadata, dest, i)
 end
 
+Process.waitall
+
 #########
 # FITS
 #########
