@@ -47,7 +47,7 @@ File.write("#{metadata}/#{File.basename(source)}-virus-scan.txt", sweep(source))
 message('filenames')
 
 def clean_names(source)
-  bad_re = /[:;&]/
+  bad_re = /[:;]/
   Find.find(source).grep(bad_re).each do |file|
     if File.directory?(file)
       FileUtils.mkdir_p(file.gsub(bad_re, '_'))
