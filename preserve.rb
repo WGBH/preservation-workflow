@@ -72,7 +72,7 @@ clean_names(source)
 ####################
 
 def remove_hidden_files(source)
-  message('hidden files')
+  message('remove_hidden_files')
   hidden_files = []
   Find.find(source).each do |file|
     next if File.directory?(file)
