@@ -76,7 +76,7 @@ def remove_hidden_files(source)
   hidden_files = []
   Find.find(source).each do |file|
     next if File.directory?(file)
-    hidden_files << file if file.split('/')[-1] =~ /^\./
+    hidden_files << file if File.basename(file) =~ /^\./
   end
 
   hidden_files.each { |path| File.delete(path) if File.exists?(path) }
