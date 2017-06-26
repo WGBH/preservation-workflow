@@ -1,7 +1,7 @@
 require 'fileutils'
 require 'find'
 
-abort("USAGE: #{$0} SOURCE METADATA DEST1 [ DEST2 ... ]") if ARGV.count < 3
+abort("USAGE: #{$0} NO-HIDDEN [ OPTIONAL ] SOURCE METADATA DEST1 [ DEST2 ... ]") if ARGV.count < 3
 
 def abort_unless(cmd, message)
   abort(message) unless ENV['CI'] || system("which #{cmd} > /dev/null")
@@ -12,11 +12,18 @@ abort_unless('fits.sh', 'Add fits to PATH and chmod: "PATH=$PATH:/.../fits; chmo
 
 def message(message)
   if ENV['CI']
-    puts "travis_fold:end:#{@last}" if @last 
+    puts "travis_fold:end:#{@last}" if @last
     puts "travis_fold:start:#{message}"
   end
   puts message
   @last = message
+end
+
+hidden = true
+
+if ARGV.first.upcase == 'NO-HIDDEN'
+  hidden = false
+  ARGV.shift
 end
 
 source = ENV['CI'] ? ARGV.shift : File.absolute_path(ARGV.shift) # Fixtures are hard with absolute path.
@@ -59,6 +66,23 @@ def clean_names(source)
 end
 
 clean_names(source)
+
+####################
+# Remove hidden files
+####################
+
+def remove_hidden_files(source)
+  message('remove_hidden_files')
+  hidden_files = []
+  Find.find(source).each do |file|
+    next if File.directory?(file)
+    hidden_files << file if File.basename(file) =~ /^\./
+  end
+
+  hidden_files.each { |path| File.delete(path) if File.exists?(path) }
+end
+
+remove_hidden_files(source) if hidden == false
 
 ###############
 # List files
@@ -112,13 +136,13 @@ fork do
     `fits.sh -i '#{source}' -o '#{metadata}'/fits -r 2>&1`
     # Noise from FITS obscures stuff that really matters.
   end
-  
+
   Find.find(metadata + '/fits') do |file|
     File.unlink(file) if File.basename(file) =~ /^\./ && File.file?(file)
   end
-  
+
   `zip -jr '#{metadata}/fits.zip' '#{metadata}/fits'`
-  
+
   Dir.glob("#{metadata}/fits/*") do |file|
     FileUtils.mv(file, "#{file}.txt")
   end
