@@ -1,5 +1,6 @@
 require 'fileutils'
 require 'find'
+require 'open3'
 
 abort("USAGE: #{$0} NO-HIDDEN [ OPTIONAL ] SOURCE METADATA DEST1 [ DEST2 ... ]") if ARGV.count < 3
 
@@ -37,15 +38,18 @@ Dir.mkdir(metadata)
 
 message('sophos')
 
-def sweep(filename)
-  if ENV['CI']
-    "fake sophos output\n"
-  else
-    `sweep '#{filename}'` # TODO: what if filename contains quotes?
-  end
+def sweep(filename, metadata)
+  output =  if ENV['CI']
+              "fake sophos output\n"
+            else
+              stdout_str, stderr_str, status = Open3.capture3("sweep #{filename}")
+              stdout_str
+              raise("virus detected in #{filename}") if status.success? == false
+            end
+  File.write("#{metadata}/#{File.basename(filename)}-virus-scan.txt", output)
 end
 
-File.write("#{metadata}/#{File.basename(source)}-virus-scan.txt", sweep(source))
+sweep(source, metadata)
 
 ####################
 # Clean filenames
@@ -73,13 +77,8 @@ clean_names(source)
 
 def remove_hidden_files(source)
   message('remove_hidden_files')
-  hidden_files = []
-  Find.find(source).each do |file|
-    next if File.directory?(file)
-    hidden_files << file if File.basename(file) =~ /^\./
-  end
 
-  hidden_files.each { |path| File.delete(path) if File.exists?(path) }
+  `find '#{source}' -name ".*" -exec rm -rf {} \\;` # Cleaner than ruby?
 end
 
 remove_hidden_files(source) if hidden == false
