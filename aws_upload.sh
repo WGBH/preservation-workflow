@@ -23,15 +23,15 @@ docs=$(printf %s "$docs" | cut -c1-$[$(printf %s "$docs" | wc -c | awk '{print $
 
 errfile="$docs/errors.txt"
 
-if aws --no-verify-ssl --endpoint-url 'http://s3-bos.wgbh.org' s3api list-buckets | grep "$bucket"
+if aws --no-verify-ssl --profile "$profile" --endpoint-url 'http://s3-bos.wgbh.org' s3api list-buckets | grep "$bucket"
 then
 	echo "bucket exists"
 else
 	echo "creating bucket"
-	aws --no-verify-ssl --endpoint-url 'http://s3-bos.wgbh.org' s3api create-bucket --bucket "$bucket" 2>> "$errfile"
+	aws --no-verify-ssl --profile "$profile" --endpoint-url 'http://s3-bos.wgbh.org' s3api create-bucket --bucket "$bucket" 2>> "$errfile"
 fi
 
-filelist=$(aws --no-verify-ssl --endpoint-url 'http://s3-bos.wgbh.org' s3api list-objects --bucket "$bucket" --query 'Contents[].Key')
+filelist=$(aws --no-verify-ssl --profile "$profile" --endpoint-url 'http://s3-bos.wgbh.org' s3api list-objects --bucket "$bucket" --query 'Contents[].Key')
 
 cd $dir
 for f in $(find "$docs/fits" \( ! -regex '.*/\..*' \) ! -path . -maxdepth 1 -type f -name '*.fits.xml.txt' -exec /bin/bash -l -c 'foo="{}";md5=$(xpath "$foo" "/fits/fileinfo/md5checksum/text()" 2>/dev/null); size=$(xpath "$foo" "/fits/fileinfo/size/text()" 2>/dev/null);path=$(xpath "$foo" "/fits/fileinfo/filepath/text()" 2>/dev/null);echo "$md5"\|"$size"\|"$path"\|"$foo"'  \; ) 
@@ -48,7 +48,7 @@ do
 	if [ -z "$(echo "$filelist" | grep "$key")" ]
 	then 
 		aws --no-verify-ssl --profile "$profile" --endpoint-url 'http://s3-bos.wgbh.org' s3api put-object --bucket "$bucket" --key "$key" --content-md5 "$base64md5" --metadata md5="$md5" --body "$path" 2>> "$errfile"
-		objectdata=$(aws --no-verify-ssl --endpoint-url 'http://s3-bos.wgbh.org' s3api head-object --bucket "$bucket" --key "$key" | jq -r '[.ContentLength,.ETag]|@tsv' | tr -d '[[:punct:]]')
+		objectdata=$(aws --no-verify-ssl --profile "$profile" --endpoint-url 'http://s3-bos.wgbh.org' s3api head-object --bucket "$bucket" --key "$key" | jq -r '[.ContentLength,.ETag]|@tsv' | tr -d '[[:punct:]]')
 		etag=$(echo "$objectdata" | cut -f2)
 		if [ ! -z "$(echo "$etag" | grep '-')" ]
 		then
